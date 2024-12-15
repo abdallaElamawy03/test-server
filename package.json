@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start":"node server",
-    "dev":"nodemon server"
+   "start": "netlify dev", 
+    "build": "netlify-lambda build src"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.2"
+    "@netlify/functions": "^2.8.2",
+    "@types/express": "^5.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

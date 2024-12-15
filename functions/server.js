@@ -1,11 +1,35 @@
-const express = require("express")
-const app = express()
-const port = process.env.port || 3500
-app.use(express.json()) // this is to request from the body
+const express = require('express');
+const serverless = require('serverless-http');
+const cors = require('cors');
 
-app.listen(port,()=>{
-    console.log(`the server is working in ${port}`)
-})
+const app = express();
+app.use(cors()); // Enable CORS
+const router = express.Router();
+
+
+// router.get('/', (req, res) => {
+//   res.send("he")
+// });
+
+router.post('/add', (req, res) => {
+  res.send('New record added.');
+});
+
+router.delete('/', (req, res) => {
+  res.send('Deleted existing record');
+});
+
+router.put('/', (req, res) => {
+  res.send('Updating existing record');
+});
+
+router.get('/demo', (req, res) => {
+  res.json([
+    { id: '001', name: 'Aayush' },
+    { id: '002', name: 'Rohit' },
+    { id: '003', name: 'Mohit' },
+  ]);
+});
 const db =[{
     name:"abdalla",
     id:"7",
@@ -18,7 +42,7 @@ const db =[{
 }]
 
 
-app.get("/",(req,res)=>{
+router.get("/",(req,res)=>{
     try{
           // Destructure to exclude 'grade'
         const {grade,...rest}=db
@@ -27,7 +51,7 @@ app.get("/",(req,res)=>{
         console.log(err.msg)
     }
 })
-app.put("/", (req, res) => {
+router.put("/", (req, res) => {
     // Assuming the request body is an object with 'name' and 'grade' properties
     
     const{name,grade}=req.body
@@ -51,10 +75,10 @@ app.put("/", (req, res) => {
     // Send the updated db object as the response
     res.json(db);
 });
-app.put("/update",(req,res)=>{//update with index cause there is no db 
+router.put("/update",(req,res)=>{//update with index cause there is no db 
 try{
 
-    const index = 3
+    const index = 1
     const {name , grade , id}=req.body
     const indexed = db[index]
     if(index <0 || index > db.length){
@@ -79,7 +103,7 @@ try{
     
     
 })
-app.delete("/", (req, res) => {
+router.delete("/", (req, res) => {
     try {
         // Clear the db object
         db.name = null; // or delete db.name;
@@ -95,9 +119,14 @@ app.delete("/", (req, res) => {
         res.status(500).json({ error: "Internal Server Error" }); // Send error response
     }
 });
-app.post("/",(req,res)=>{
+router.post("/",(req,res)=>{
     db.unshift({name:"abdalla",id:"06",grade:"5"})
     res.json(db)
         
     
 })
+
+
+// Use the router for Netlify functions
+app.use('/.netlify/functions/server', router); // Ensure this matches the function name
+module.exports.handler = serverless(app);
